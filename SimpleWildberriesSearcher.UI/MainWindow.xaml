@@ -18,7 +18,9 @@
         </Style>
         <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">
             <Setter Property="DockPanel.Dock" Value="Right"></Setter>
+            <Setter Property="Padding" Value="5, 0, 0, 0"></Setter>
             <Setter Property="Height" Value="25"></Setter>
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
             <Setter Property="IsEnabled" Value="False"></Setter>
         </Style>
     </Window.Resources>
@@ -50,7 +52,7 @@
 
             <!-- Section: Processing based on user's input -->
             <DockPanel>
-                <Button x:Name="BtnExport" Style="{StaticResource ButtonStyle}" Content="Export to Excel"
+                <Button x:Name="BtnExport" Style="{StaticResource ButtonStyle}" Content="Export to Excel" IsEnabled="False"
                         Click="BtnExport_Click"></Button>
             </DockPanel>
         </StackPanel>
