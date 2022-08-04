@@ -1,0 +1,58 @@
+﻿<Window x:Class="SimpleWildberriesSearcher.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SimpleWildberriesSearcher.UI"
+        mc:Ignorable="d"
+        Title="Simple Wildberries Searcher"
+        Height="200" Width="500"
+        ResizeMode="CanMinimize">
+    
+    <Window.Resources>
+        <Style x:Key="ButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="DockPanel.Dock" Value="Left"></Setter>
+            <Setter Property="Padding" Value="10, 0, 10, 0"></Setter>
+            <Setter Property="Width" Value="100"></Setter>
+            <Setter Property="Height" Value="25"></Setter>
+        </Style>
+        <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">
+            <Setter Property="DockPanel.Dock" Value="Right"></Setter>
+            <Setter Property="Height" Value="25"></Setter>
+            <Setter Property="IsEnabled" Value="False"></Setter>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Margin="25">
+        <StackPanel>
+            <!-- Styles for the current StackPanel -->
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type DockPanel}">
+                    <Setter Property="Margin" Value="0, 10, 0, 0"></Setter>
+                </Style>
+            </StackPanel.Resources>
+            
+            <!-- Section: Choosing a file with categories -->
+            <DockPanel>
+                <Button x:Name="BtnOpenCategoriesFile" Style="{StaticResource ButtonStyle}" Content="Open file:"
+                        Click="BtnOpenCategoriesFile_Click"></Button>
+                <TextBox x:Name="TxtCategoriesFile" Style="{StaticResource TextBoxStyle}"
+                         TextChanged="InputTextBoxes_TextChanged"></TextBox>
+            </DockPanel>
+
+            <!-- Section: Choosing an output path -->
+            <DockPanel>
+                <Button x:Name="BtnOpenOutputFolder" Style="{StaticResource ButtonStyle}" Content="Output to:"
+                        Click="BtnOpenOutputFolder_Click"></Button>
+                <TextBox x:Name="TxtOutputFolder" Style="{StaticResource TextBoxStyle}"
+                         TextChanged="InputTextBoxes_TextChanged"></TextBox>
+            </DockPanel>
+
+            <!-- Section: Processing based on user's input -->
+            <DockPanel>
+                <Button x:Name="BtnExport" Style="{StaticResource ButtonStyle}" Content="Export to Excel"
+                        Click="BtnExport_Click"></Button>
+            </DockPanel>
+        </StackPanel>
+    </Grid>
+</Window>
