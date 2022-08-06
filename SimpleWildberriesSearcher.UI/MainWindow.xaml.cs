@@ -1,18 +1,12 @@
-﻿using System;
+﻿using SimpleWildberriesSearcher.Core.Services.ExportService;
+using SimpleWildberriesSearcher.Core.Services.SearchService;
+using SimpleWildberriesSearcher.UI.Helpers;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace SimpleWildberriesSearcher.UI
 {
@@ -21,8 +15,14 @@ namespace SimpleWildberriesSearcher.UI
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private readonly ISearchService _searchService;
+        private readonly IExportService _exportService;
+
+        public MainWindow(ISearchService searchService, IExportService exportService)
         {
+            _searchService = searchService;
+            _exportService = exportService;
+
             InitializeComponent();
             SetIcon();
         }
@@ -36,6 +36,16 @@ namespace SimpleWildberriesSearcher.UI
             string iconPath = string.Concat(AppDomain.CurrentDomain.BaseDirectory, "Resources\\wb_logo.ico");
             Uri iconUri = new Uri(iconPath, UriKind.RelativeOrAbsolute);
             this.Icon = BitmapFrame.Create(iconUri);
+        }
+
+        /// <summary>
+        /// Enables or disables button controls depending on provided value.
+        /// </summary>
+        private void ToggleButtons(bool buttonState)
+        {
+            this.BtnOpenCategoriesFile.IsEnabled = buttonState;
+            this.BtnOpenOutputFolder.IsEnabled = buttonState;
+            this.BtnExport.IsEnabled = buttonState;
         }
         #endregion
 
@@ -54,7 +64,17 @@ namespace SimpleWildberriesSearcher.UI
             using (FolderBrowserDialog dialog = new())
             {
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    this.TxtOutputFolder.Text = dialog.SelectedPath + System.IO.Path.DirectorySeparatorChar;
+                {
+                    var textBlock = dialog.SelectedPath;
+
+                    int lastIndex = textBlock.Length - 1;
+                    if (textBlock[lastIndex] != System.IO.Path.DirectorySeparatorChar)
+                        textBlock += System.IO.Path.DirectorySeparatorChar;
+
+                    textBlock += "SearchOutput.xlsx";
+
+                    this.TxtOutputFolder.Text = textBlock;
+                }
             }
         }
 
@@ -64,9 +84,26 @@ namespace SimpleWildberriesSearcher.UI
             this.BtnExport.IsEnabled = areTextBoxesFilled;
         }
 
-        private void BtnExport_Click(object sender, RoutedEventArgs e)
+        private async void BtnExport_Click(object sender, RoutedEventArgs e)
         {
+            ToggleButtons(false);
+            this.LblProcessState.Content = "Loading cards from Wildberries...";
 
+            // reading file
+            IEnumerable<string> parsedCategories = FileReaderHelper.ReadFile(this.TxtCategoriesFile.Text);
+
+            // getting cards
+            var cards = await _searchService.SearchAsync(parsedCategories);
+
+            this.LblProcessState.Content = "Exporting to Excel...";
+
+            // exporting to Excel
+            await _exportService.ExportAsync(this.TxtOutputFolder.Text, cards);
+
+            ToggleButtons(true);
+            this.LblProcessState.Content = "Export done successfully!";
+
+            return;
         }
         #endregion
     }

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SimpleWildberriesSearcher.UI"
         mc:Ignorable="d"
         Title="Simple Wildberries Searcher"
-        Height="200" Width="500"
+        Height="240" Width="700"
         ResizeMode="CanMinimize">
     
     <Window.Resources>
@@ -54,6 +54,12 @@
             <DockPanel>
                 <Button x:Name="BtnExport" Style="{StaticResource ButtonStyle}" Content="Export to Excel" IsEnabled="False"
                         Click="BtnExport_Click"></Button>
+            </DockPanel>
+
+            <DockPanel>
+                <Label x:Name="LblProcessState" Visibility="Visible"
+                       VerticalContentAlignment="Center" HorizontalAlignment="Center" 
+                       Height="30" Content="Text"></Label>
             </DockPanel>
         </StackPanel>
     </Grid>
