@@ -22,6 +22,9 @@ namespace SimpleWildberriesSearcher.Core.Services.ExportService
             {
                 foreach (var collection in items)
                 {
+                    if (collection.Name == string.Empty)
+                        continue;
+
                     ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(collection.Name);
                     worksheet.Cells.LoadFromCollection(collection.Cards, PrintHeaders: true);
                 }

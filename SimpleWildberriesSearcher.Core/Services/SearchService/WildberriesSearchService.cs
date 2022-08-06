@@ -25,14 +25,11 @@ namespace SimpleWildberriesSearcher.Core.Services.SearchService
 
         private Dictionary<string, string> _searchAllQueryParams = new()
         {
-            // basically, WB uses these params in almost every their XHP request
             { "curr", "rub" },
             { "dest", "-1029256,-102269,-2162196,-1257786" },
             { "lang", "ru" },
             { "locale", "ru" },
             { "regions", "68,64,83,4,38,80,33,70,82,86,75,30,69,22,66,31,40,1,48,71" },
-
-            // parameters which are specific to "Search all" request
             { "resultset", "catalog" },
             { "sort", "popular" },
             { "suppressSpellcheck", "false" },
@@ -84,7 +81,9 @@ namespace SimpleWildberriesSearcher.Core.Services.SearchService
             if (responseObj == null)
                 return new WildberriesCardCollection();
 
-            var serializedItems = responseObj["data"]["products"].Children().ToList();
+            var serializedItems = responseObj["data"]?["products"]?.Children().ToList();
+            if (serializedItems == null)
+                return new WildberriesCardCollection();
 
             foreach (var item in serializedItems)
             {

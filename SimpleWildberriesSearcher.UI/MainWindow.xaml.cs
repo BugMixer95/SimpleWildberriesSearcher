@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace SimpleWildberriesSearcher.UI
@@ -52,7 +53,7 @@ namespace SimpleWildberriesSearcher.UI
         #region Event Handlers
         private void BtnOpenCategoriesFile_Click(object sender, RoutedEventArgs e)
         {
-            using (OpenFileDialog dialog = new() { Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*" })
+            using (OpenFileDialog dialog = new() { Filter = "Text files (*.txt)|*.txt" })
             {
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     this.TxtCategoriesFile.Text = dialog.FileName;
@@ -87,23 +88,36 @@ namespace SimpleWildberriesSearcher.UI
         private async void BtnExport_Click(object sender, RoutedEventArgs e)
         {
             ToggleButtons(false);
+            this.LblProcessState.Foreground = Brushes.Blue;
             this.LblProcessState.Content = "Loading cards from Wildberries...";
 
-            // reading file
-            IEnumerable<string> parsedCategories = FileReaderHelper.ReadFile(this.TxtCategoriesFile.Text);
+            try
+            {
+                // reading file
+                IEnumerable<string> parsedCategories = FileReaderHelper.ReadFile(this.TxtCategoriesFile.Text);
 
-            // getting cards
-            var cards = await _searchService.SearchAsync(parsedCategories);
+                // getting cards
+                var cards = await _searchService.SearchAsync(parsedCategories);
 
-            this.LblProcessState.Content = "Exporting to Excel...";
+                this.LblProcessState.Content = "Exporting to Excel...";
 
-            // exporting to Excel
-            await _exportService.ExportAsync(this.TxtOutputFolder.Text, cards);
+                // exporting to Excel
+                await _exportService.ExportAsync(this.TxtOutputFolder.Text, cards);
 
-            ToggleButtons(true);
-            this.LblProcessState.Content = "Export done successfully!";
-
-            return;
+                this.LblProcessState.Content = "Export done successfully!";
+            }
+            catch (Exception ex)
+            {
+                this.LblProcessState.Foreground = Brushes.Red;
+                this.LblProcessState.Content = string.Format(
+                    "{0}. {1}",
+                    ex.Message,
+                    ex.InnerException?.Message);
+            }
+            finally
+            {
+                ToggleButtons(true);
+            }
         }
         #endregion
     }
