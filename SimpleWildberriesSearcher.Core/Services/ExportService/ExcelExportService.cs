@@ -10,27 +10,47 @@ namespace SimpleWildberriesSearcher.Core.Services.ExportService
     {
         /// <inheritdoc />
         /// <param name="filePath">Path of an Excel file where collections should be exported to.</param>
-        public async Task ExportAsync(string filePath, IEnumerable<ICardCollection> items)
+        public async Task<IExportResult> ExportAsync(string filePath, IEnumerable<ICardCollection> collections)
         {
-            FileInfo fileInfo = new FileInfo(filePath);
+            ExportResult result = new() { StatusCode = ExportStatusCode.Done };
 
-            if (File.Exists(filePath))
-                File.Delete(filePath);
-
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            using (ExcelPackage package = new(fileInfo))
+            try
             {
-                foreach (var collection in items)
+                FileInfo fileInfo = new FileInfo(filePath);
+
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                using (ExcelPackage package = new(fileInfo))
                 {
-                    if (collection.Name == string.Empty)
-                        continue;
+                    foreach (var collection in collections)
+                    {
+                        if (collection.Name == string.Empty)
+                            continue;
 
-                    ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(collection.Name);
-                    worksheet.Cells.LoadFromCollection(collection.Cards, PrintHeaders: true);
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(collection.Name);
+                        worksheet.Cells.LoadFromCollection(collection.Cards, PrintHeaders: true);
+                    }
+
+                    if (collections.Count() <= 0)
+                    {
+                        ExcelWorksheet dummyWorksheet = package.Workbook.Worksheets.Add("_");
+
+                        result.StatusCode = ExportStatusCode.DoneWithNuances;
+                        result.Nuance = "File is created, but there was no data to export. Choose another file.";
+                    }
+
+                    await package.SaveAsync();
                 }
-
-                await package.SaveAsync();
             }
+            catch (Exception ex)
+            {
+                result.StatusCode = ExportStatusCode.Failed;
+                result.Exception = ex;
+            }
+
+            return result;
         }
     }
 }

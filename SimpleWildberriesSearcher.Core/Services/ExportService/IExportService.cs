@@ -9,8 +9,8 @@
         /// Asynchronously exports collections of cards using provided connection.
         /// </summary>
         /// <param name="connection">Destination of a source to export to.</param>
-        /// <param name="items">Collections of cards to export.</param>
+        /// <param name="collections">Collections of cards to export.</param>
         /// <returns></returns>
-        Task ExportAsync(string connection, IEnumerable<ICardCollection> items);
+        Task<IExportResult> ExportAsync(string connection, IEnumerable<ICardCollection> collections);
     }
 }

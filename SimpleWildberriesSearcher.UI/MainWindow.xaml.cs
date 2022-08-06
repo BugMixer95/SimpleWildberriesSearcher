@@ -102,9 +102,14 @@ namespace SimpleWildberriesSearcher.UI
                 this.LblProcessState.Content = "Exporting to Excel...";
 
                 // exporting to Excel
-                await _exportService.ExportAsync(this.TxtOutputFolder.Text, cards);
+                IExportResult exportResult = await _exportService.ExportAsync(this.TxtOutputFolder.Text, cards);
 
-                this.LblProcessState.Content = "Export done successfully!";
+                _ = exportResult.StatusCode switch
+                {
+                    ExportStatusCode.Done => this.LblProcessState.Content = "Export done successfully!",
+                    ExportStatusCode.DoneWithNuances => this.LblProcessState.Content = exportResult.Nuance,
+                    ExportStatusCode.Failed => throw exportResult.Exception
+                };
             }
             catch (Exception ex)
             {

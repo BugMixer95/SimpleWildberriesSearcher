@@ -58,8 +58,8 @@
 
             <DockPanel>
                 <Label x:Name="LblProcessState" Visibility="Visible"
-                       VerticalContentAlignment="Center" HorizontalAlignment="Center" 
-                       Height="30" Content="Text"></Label>
+                       VerticalContentAlignment="Top" HorizontalAlignment="Center" 
+                       Height="60"></Label>
             </DockPanel>
         </StackPanel>
     </Grid>
