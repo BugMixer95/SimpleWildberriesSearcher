@@ -29,6 +29,22 @@ namespace SimpleWildberriesSearcher.Core.Services.ExportService
                         if (collection.Name == string.Empty)
                             continue;
 
+                        if (collection.Cards.Count == 0)
+                        {
+                            if (string.IsNullOrEmpty(result.Nuance))
+                            {
+                                result.Nuance = "Some of categories were exported with empty result because no data has been found. \n" +
+                                    "Categories with empty result: ";
+                            }
+                            else
+                            {
+                                result.Nuance += "; ";
+                            }
+
+                            result.Nuance += collection.Name;
+                            result.StatusCode = ExportStatusCode.DoneWithNuances;
+                        }
+
                         ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(collection.Name);
                         worksheet.Cells.LoadFromCollection(collection.Cards, PrintHeaders: true);
                     }

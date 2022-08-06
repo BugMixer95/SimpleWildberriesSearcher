@@ -67,7 +67,10 @@ namespace SimpleWildberriesSearcher.Core.Services.SearchService
         /// <param name="category">Category name.</param>
         private async Task<ICardCollection> GetCards(string category)
         {
-            ICardCollection collection = new WildberriesCardCollection() { Name = category };
+            if (string.IsNullOrEmpty(category))
+                return new WildberriesCardCollection();
+
+            ICardCollection collection = new WildberriesCardCollection(category);
 
             string requestUri = string.Empty;
 
@@ -79,11 +82,11 @@ namespace SimpleWildberriesSearcher.Core.Services.SearchService
 
             JObject responseObj = await SendGetRequest(requestUri);
             if (responseObj == null)
-                return new WildberriesCardCollection();
+                return new WildberriesCardCollection(category);
 
             var serializedItems = responseObj["data"]?["products"]?.Children().ToList();
             if (serializedItems == null)
-                return new WildberriesCardCollection();
+                return new WildberriesCardCollection(category);
 
             foreach (var item in serializedItems)
             {
@@ -91,13 +94,16 @@ namespace SimpleWildberriesSearcher.Core.Services.SearchService
                 {
                     string itemId = item["id"].ToString();
 
+                    string unparsedPrice = item["priceU"].ToString();
+                    int priceLength = unparsedPrice.Length;
+
                     ICard card = new WildberriesCard()
                     {
                         Id = itemId,
                         Name = item["name"].ToString(),
                         Brand = item["brand"].ToString(),
                         Feedbacks = int.Parse(item["feedbacks"].ToString()),
-                        Price = double.Parse(item["priceU"].ToString().TrimEnd('0'))
+                        Price = double.Parse(unparsedPrice.AsSpan(0, priceLength - 2))
                     };
 
                     collection.Cards.Add(card);
